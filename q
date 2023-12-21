@@ -1,0 +1,24 @@
+   Catalog   
+-------------
+ blackhole   
+ delta       
+ dolphindb   
+ druid       
+ example     
+ hana        
+ hive        
+ hudi        
+ iceberg     
+ jmx         
+ localfile   
+ memory      
+ mysql       
+ pinot       
+ postgresql  
+ prometheus  
+ singlestore 
+ sqlserver   
+ system      
+ tpcds       
+ tpch        
+(21 rows)

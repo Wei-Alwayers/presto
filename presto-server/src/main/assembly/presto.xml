@@ -216,5 +216,9 @@
             <directory>${project.build.directory}/dependency/presto-clickhouse-${project.version}</directory>
             <outputDirectory>plugin/clickhouse</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/dependency/presto-dolphindb-${project.version}</directory>
+            <outputDirectory>plugin/presto-dolphindb</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
