@@ -17,16 +17,43 @@ import com.facebook.airlift.configuration.Config;
 
 public class DolphinDBConfig
 {
-    private boolean autoReconnect = true;
-    public boolean isAutoReconnect()
+    private boolean allowMultiQueries;
+    private boolean enableHighAvailability;
+    private int waitingTime = 3;
+
+    public int getWaitingTime()
     {
-        return autoReconnect;
+        return waitingTime;
     }
 
-    @Config("dolphindb.auto-reconnect")
-    public DolphinDBConfig setAutoReconnect(boolean autoReconnect)
+    @Config("dolphindb.waitingTime")
+    public DolphinDBConfig setWaitingTime(int connectionTimeout)
     {
-        this.autoReconnect = autoReconnect;
+        this.waitingTime = connectionTimeout;
+        return this;
+    }
+
+    public boolean getAllowMultiQueries()
+    {
+        return allowMultiQueries;
+    }
+
+    @Config("dolphindb.allowMultiQueries")
+    public DolphinDBConfig setAllowMultiQueries(boolean allowMultiQueries)
+    {
+        this.allowMultiQueries = allowMultiQueries;
+        return this;
+    }
+
+    public boolean getEnableHighAvailability()
+    {
+        return enableHighAvailability;
+    }
+
+    @Config("dolphindb.enableHighAvailability")
+    public DolphinDBConfig setEnableHighAvailability(boolean enableHighAvailability)
+    {
+        this.enableHighAvailability = enableHighAvailability;
         return this;
     }
 }
