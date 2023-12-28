@@ -42,8 +42,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.facebook.presto.plugin.jdbc.DriverConnectionFactory.basicConnectionProperties;
 import static com.facebook.presto.plugin.jdbc.JdbcErrorCode.JDBC_ERROR;
@@ -133,15 +131,16 @@ public class DolphinDBClient
         // select null from -> select * from
         sql = sql.replaceAll("(?i)\\bSELECT\\s+NULL\\s+FROM\\b", "SELECT * FROM");
 
-        // 直接替换 "/*" 为 " /*"
-        sql = sql.replace("/*", " /*");
+//        // 直接替换 "/*" 为 " /*"
+//        sql = sql.replace("/*", " /*");
+//
+//        // 使用正则表达式匹配 database.table
+//        Pattern pattern = Pattern.compile("from\\s+(\\w+://[^\\s.]+)\\.([^\\s.]+)\\s+", Pattern.CASE_INSENSITIVE);
+//        Matcher matcher = pattern.matcher(sql);
+//
+//        // 进行替换
+//        sql = matcher.replaceAll("FROM loadTable(\"$1\", \"$2\") ");
 
-        // 使用正则表达式匹配 database.table
-        Pattern pattern = Pattern.compile("from\\s+(\\w+://[^\\s.]+)\\.([^\\s.]+)\\s+", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(sql);
-
-        // 进行替换
-        sql = matcher.replaceAll("FROM loadTable(\"$1\", \"$2\") ");
         PreparedStatement statement = connection.prepareStatement(sql);
         return statement;
     }
