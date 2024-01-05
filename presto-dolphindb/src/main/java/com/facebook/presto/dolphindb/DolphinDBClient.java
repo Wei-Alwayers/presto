@@ -129,7 +129,7 @@ public class DolphinDBClient
         sql = sql.replaceAll("[()]", "");
 
         // select null from -> select * from
-        sql = sql.replaceAll("(?i)\\bSELECT\\s+NULL\\s+FROM\\b", "SELECT * FROM");
+//        sql = sql.replaceAll("(?i)\\bSELECT\\s+NULL\\s+FROM\\b", "SELECT * FROM");
 
 //        // 直接替换 "/*" 为 " /*"
 //        sql = sql.replace("/*", " /*");
