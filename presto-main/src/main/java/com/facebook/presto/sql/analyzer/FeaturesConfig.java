@@ -275,6 +275,7 @@ public class FeaturesConfig
     private PushDownFilterThroughCrossJoinStrategy pushDownFilterExpressionEvaluationThroughCrossJoin = PushDownFilterThroughCrossJoinStrategy.REWRITTEN_TO_INNER_JOIN;
     private boolean rewriteCrossJoinWithOrFilterToInnerJoin = true;
     private boolean rewriteCrossJoinWithArrayContainsFilterToInnerJoin = true;
+    private LeftJoinArrayContainsToInnerJoinStrategy leftJoinWithArrayContainsToEquiJoinStrategy = LeftJoinArrayContainsToInnerJoinStrategy.DISABLED;
     private boolean rewriteCrossJoinWithArrayNotContainsFilterToAntiJoin = true;
     private JoinNotNullInferenceStrategy joinNotNullInferenceStrategy = NONE;
     private boolean leftJoinNullFilterToSemiJoin = true;
@@ -294,6 +295,7 @@ public class FeaturesConfig
 
     private boolean removeRedundantCastToVarcharInJoin = true;
     private boolean skipHashGenerationForJoinWithTableScanInput;
+    private long kHyperLogLogAggregationGroupNumberLimit;
 
     public enum PartitioningPrecisionStrategy
     {
@@ -431,6 +433,13 @@ public class FeaturesConfig
          * to check if this function can operate on NULL inputs
          */
         USE_FUNCTION_METADATA
+    }
+
+    // TODO: Implement cost based strategy
+    public enum LeftJoinArrayContainsToInnerJoinStrategy
+    {
+        DISABLED,
+        ALWAYS_ENABLED
     }
 
     public double getCpuCostWeight()
@@ -2768,6 +2777,19 @@ public class FeaturesConfig
         return this;
     }
 
+    public LeftJoinArrayContainsToInnerJoinStrategy getLeftJoinWithArrayContainsToEquiJoinStrategy()
+    {
+        return leftJoinWithArrayContainsToEquiJoinStrategy;
+    }
+
+    @Config("optimizer.left-join-with-array-contains-to-equi-join-strategy")
+    @ConfigDescription("When to apply rewrite left join with array contains to equi join")
+    public FeaturesConfig setLeftJoinWithArrayContainsToEquiJoinStrategy(LeftJoinArrayContainsToInnerJoinStrategy leftJoinWithArrayContainsToEquiJoinStrategy)
+    {
+        this.leftJoinWithArrayContainsToEquiJoinStrategy = leftJoinWithArrayContainsToEquiJoinStrategy;
+        return this;
+    }
+
     public boolean isRewriteCrossJoinWithArrayNotContainsFilterToAntiJoin()
     {
         return this.rewriteCrossJoinWithArrayNotContainsFilterToAntiJoin;
@@ -2934,6 +2956,19 @@ public class FeaturesConfig
     public FeaturesConfig setSkipHashGenerationForJoinWithTableScanInput(boolean skipHashGenerationForJoinWithTableScanInput)
     {
         this.skipHashGenerationForJoinWithTableScanInput = skipHashGenerationForJoinWithTableScanInput;
+        return this;
+    }
+
+    public long getKHyperLogLogAggregationGroupNumberLimit()
+    {
+        return kHyperLogLogAggregationGroupNumberLimit;
+    }
+
+    @Config("khyperloglog-agg-group-limit")
+    @ConfigDescription("Maximum number of groups for khyperloglog_agg per task")
+    public FeaturesConfig setKHyperLogLogAggregationGroupNumberLimit(long kHyperLogLogAggregationGroupNumberLimit)
+    {
+        this.kHyperLogLogAggregationGroupNumberLimit = kHyperLogLogAggregationGroupNumberLimit;
         return this;
     }
 }

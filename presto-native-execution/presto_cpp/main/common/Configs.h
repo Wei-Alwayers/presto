@@ -29,7 +29,12 @@ class ConfigBase {
   /// Reads configuration properties from the specified file. Must be called
   /// before calling any of the getters below.
   /// @param filePath Path to configuration file.
-  virtual void initialize(const std::string& filePath);
+  void initialize(const std::string& filePath);
+
+  /// Allows individual config to manipulate just-loaded-from-file key-value map
+  /// before it is used to initialize the config.
+  virtual void updateLoadedValues(
+      std::unordered_map<std::string, std::string>& values) const {}
 
   /// Uses a config object already materialized.
   void initialize(std::unique_ptr<velox::Config>&& config) {
@@ -125,6 +130,10 @@ class ConfigBase {
     return optionalProperty(std::string{propertyName});
   }
 
+  /// Returns "N<capacity_unit>" as string containing capacity in bytes.
+  std::string capacityPropertyAsBytesString(
+      std::string_view propertyName) const;
+
   /// Returns copy of the config values map.
   std::unordered_map<std::string, std::string> values() const {
     return config_->valuesCopy();
@@ -205,6 +214,11 @@ class SystemConfig : public ConfigBase {
   /// 1.0 is default.
   static constexpr std::string_view kSpillerNumCpuThreadsHwMultiplier{
       "spiller.num-cpu-threads-hw-multiplier"};
+  /// Config used to create spill files. This config is provided to underlying
+  /// file system and the config is free form. The form should be defined by the
+  /// underlying file system.
+  static constexpr std::string_view kSpillerFileCreateConfig{
+      "spiller.file-create-config"};
 
   static constexpr std::string_view kSpillerSpillPath{
       "experimental.spiller-spill-path"};
@@ -423,9 +437,16 @@ class SystemConfig : public ConfigBase {
   static constexpr std::string_view kInternalCommunicationJwtExpirationSeconds{
       "internal-communication.jwt.expiration-seconds"};
 
+  /// Below are the Presto properties from config.properties that get converted
+  /// to their velox counterparts in BaseVeloxQueryConfig and used solely from
+  /// BaseVeloxQueryConfig.
+
   /// Uses legacy version of array_agg which ignores nulls.
   static constexpr std::string_view kUseLegacyArrayAgg{
       "deprecated.legacy-array-agg"};
+  static constexpr std::string_view kSinkMaxBufferSize{"sink.max-buffer-size"};
+  static constexpr std::string_view kDriverMaxPagePartitioningBufferSize{
+      "driver.max-page-partitioning-buffer-size"};
 
   SystemConfig();
 
@@ -494,6 +515,8 @@ class SystemConfig : public ConfigBase {
   double driverNumCpuThreadsHwMultiplier() const;
 
   double spillerNumCpuThreadsHwMultiplier() const;
+
+  std::string spillerFileCreateConfig() const;
 
   folly::Optional<std::string> spillerSpillPath() const;
 
@@ -642,13 +665,10 @@ class BaseVeloxQueryConfig : public ConfigBase {
 
   virtual ~BaseVeloxQueryConfig() = default;
 
-  void initialize(const std::string& filePath) override;
+  void updateLoadedValues(
+      std::unordered_map<std::string, std::string>& values) const override;
 
   static BaseVeloxQueryConfig* instance();
-
- private:
-  /// Update velox config with values from presto system config.
-  void update(const SystemConfig& config);
 };
 
 } // namespace facebook::presto

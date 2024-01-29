@@ -346,7 +346,8 @@ void PrestoServer::run() {
   facebook::velox::exec::ExchangeSource::registerFactory(
       operators::BroadcastExchangeSource::createExchangeSource);
 
-  pool_ = velox::memory::addDefaultLeafMemoryPool();
+  pool_ =
+      velox::memory::MemoryManager::getInstance()->addLeafPool("PrestoServer");
   taskManager_ = std::make_unique<TaskManager>(
       driverExecutor_.get(), httpSrvCpuExecutor_.get(), spillerExecutor_.get());
 
@@ -656,9 +657,9 @@ void PrestoServer::initializeVeloxMemory() {
         systemConfig->memoryPoolTransferCapacity();
     options.arbitrationStateCheckCb = velox::exec::memoryArbitrationStateCheck;
   }
-  const auto& manager = memory::MemoryManager::getInstance(options);
+  memory::initializeMemoryManager(options);
   PRESTO_STARTUP_LOG(INFO) << "Memory manager has been setup: "
-                           << manager.toString();
+                           << memory::memoryManager()->toString();
 }
 
 void PrestoServer::stop() {
